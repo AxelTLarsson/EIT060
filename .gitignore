@@ -18,3 +18,8 @@ rootCert.pem
 rootCert.srl
 signedCert
 truststore
+clienttruststore
+serverkeystore
+servertruststore
+signedSrvCert
+srvKeyStore.csr
