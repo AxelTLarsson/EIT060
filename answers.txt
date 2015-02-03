@@ -6,7 +6,8 @@ Question C: Extensions are used as restrictions on the certificate. A certificat
 
 Question D: Should not be done since the certificates should have different serial numbers.
 
-Question E:
+Question E: The truststore passwords protects the integrity of the truststore so that no one can change what certificates the system trusts.
+The keystore passwords protects both the integrity of the keystore, as well as each of the keys inside the keystore.
 
 Question F: It takes the message sent from the client, inverts it, and sends it back. E.g. 123 returns 321.
 
