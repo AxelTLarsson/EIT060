@@ -2,7 +2,7 @@ Question A: with this option the CA serial number file is created if it does not
 
 Question B:
 
-Question C:
+Question C: Extensions are used as restrictions on the certificate. A certificate with extensions cannot be used without fulfilling the extensions restrictions.
 
 Question D:
 
