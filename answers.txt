@@ -12,6 +12,7 @@ The keystore passwords protects both the integrity of the keystore, as well as e
 Question F: It takes the message sent from the client, inverts it, and sends it back. E.g. 123 returns 321.
 
 Question G: If changed to setNeedClientAuth(true) to setNeedClientAuth(false) the server gives a message saying that the client died.
+Client authentication is not needed.
 
 Client died: peer not authenticated
 javax.net.ssl.SSLPeerUnverifiedException: peer not authenticated
