@@ -1,0 +1,59 @@
+Question A: with this option the CA serial number file is created if it does not exist: it will contain the serial number "02" and the certificate being signed will have the 1 as its serial number. Normally if the -CA option is specified and the serial number file does not exist it is an error.
+
+Question B:
+
+Question C:
+
+Question D:
+
+Question E:
+
+Question F: It takes the message sent from the client, inverts it, and sends it back. E.g. 123 returns 321.
+
+Question G: If changed to setNeedClientAuth(true) to setNeedClientAuth(false) the server gives a message saying that the client died.
+
+Client died: peer not authenticated
+javax.net.ssl.SSLPeerUnverifiedException: peer not authenticated
+        at sun.security.ssl.SSLSessionImpl.getPeerCertificateChain(SSLSessionImp                                   l.java:446)
+        at server.run(server.java:22)
+        at java.lang.Thread.run(Thread.java:745)
+
+Question H: SERVER MESSAGES
+
+java server 8765
+
+Server Started
+
+client connected
+client name (cert subject DN field): CN=dat11al1 (Axel Larsson)/dat12pbr (Patrik Brosell)/dic12aha (Adrian Hansson)/dat12cti (Carl Tidelius)
+client issuer (cert issuer DN field): CN=CA
+client certificate serial: 16496765095132861958
+1 concurrent connection(s)
+
+
+
+--------------------------------------
+
+
+CLIENT MESSAGES
+
+java client localhost 8765
+args[0] = localhost
+args[1] = 8765
+
+socket before handshake:
+67591ba4[SSL_NULL_WITH_NULL_NULL: Socket[addr=localhost/127.0.0.1,port=8765,localport=47305]]
+
+certificate name (subject DN field) on certificate received from server:
+CN=myserver
+
+certificate issuer on cert recieved from server:
+CN=CA
+
+certificate serial number on cert recieved from server:
+16496765095132861959
+
+socket after handshake:
+67591ba4[TLS_DHE_DSS_WITH_AES_256_CBC_SHA: Socket[addr=localhost/127.0.0.1,port=8765,localport=47305]]
+
+secure connection established
