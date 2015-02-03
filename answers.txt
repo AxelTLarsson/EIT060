@@ -4,7 +4,7 @@ Question B:
 
 Question C: Extensions are used as restrictions on the certificate. A certificate with extensions cannot be used without fulfilling the extensions restrictions.
 
-Question D:
+Question D: Should not be done since the certificates should have different serial numbers.
 
 Question E:
 
