@@ -1,6 +1,6 @@
 Question A: with this option the CA serial number file is created if it does not exist: it will contain the serial number "02" and the certificate being signed will have the 1 as its serial number. Normally if the -CA option is specified and the serial number file does not exist it is an error.
 
-Question B:
+Question B: With openssl using -extfile and specifying an extentionfile would force generation of a version 3 certificate.
 
 Question C: Extensions are used as restrictions on the certificate. A certificate with extensions cannot be used without fulfilling the extensions restrictions.
 
