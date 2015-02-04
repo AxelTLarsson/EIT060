@@ -12,7 +12,7 @@
 hs_err_pid*
 
 certSignReq.csr
-clientkeystore
+./clientkeystore
 rootCAkey.pem
 rootCert.pem
 rootCert.srl
