@@ -22,15 +22,18 @@ javax.net.ssl.SSLPeerUnverifiedException: peer not authenticated
 
 Question H: SERVER MESSAGES
 
-java server 8765
+java server 7986
 
 Server Started
 
 client connected
-client name (cert subject DN field): CN=dat11al1 (Axel Larsson)/dat12pbr (Patrik Brosell)/dic12aha (Adrian Hansson)/dat12cti (Carl Tidelius)
+client name (cert subject DN field): CN=dat11al1 (Axel Larsson)/dat12pbr (Patrik Brosell)/dic13aha (Adrian Hansson)/dat12cti (Carl Tidelius)
 client issuer (cert issuer DN field): CN=CA
-client certificate serial: 16496765095132861958
+client certificate serial: 13470147559860429018
 1 concurrent connection(s)
+
+received '123' from client
+sending '321' to client...done
 
 
 
@@ -39,12 +42,18 @@ client certificate serial: 16496765095132861958
 
 CLIENT MESSAGES
 
-java client localhost 8765
+java client localhost 7986
 args[0] = localhost
-args[1] = 8765
+args[1] = 7986
 
 socket before handshake:
-67591ba4[SSL_NULL_WITH_NULL_NULL: Socket[addr=localhost/127.0.0.1,port=8765,localport=47305]]
+74895110[SSL_NULL_WITH_NULL_NULL: Socket[addr=localhost/127.0.0.1,port=7986,localport=38511]]
+
+client connected
+client name (cert subject DN field): CN=dat11al1 (Axel Larsson)/dat12pbr (Patrik Brosell)/dic13aha (Adrian Hansson)/dat12cti (Carl Tidelius)
+client issuer (cert issuer DN field): CN=CA
+client certificate serial: 13470147559860429018
+1 concurrent connection(s)
 
 certificate name (subject DN field) on certificate received from server:
 CN=myserver
@@ -53,9 +62,19 @@ certificate issuer on cert recieved from server:
 CN=CA
 
 certificate serial number on cert recieved from server:
-16496765095132861959
+13470147559860429019
 
 socket after handshake:
-67591ba4[TLS_DHE_DSS_WITH_AES_256_CBC_SHA: Socket[addr=localhost/127.0.0.1,port=8765,localport=47305]]
+74895110[TLS_DHE_DSS_WITH_AES_256_CBC_SHA: Socket[addr=localhost/127.0.0.1,port=7986,localport=38511]]
 
 secure connection established
+
+
+>123
+sending '123' to server...done
+received '123' from client
+sending '321' to client...done
+
+received '321' from server
+
+>

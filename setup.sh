@@ -19,7 +19,7 @@ print_green "* Adding root certificate \"CA\" to new trustore..."
 keytool -import -file rootCert.pem -alias CA -keystore clienttruststore -storepass password -noprompt
 # 3.
 print_green "* Creating end-user keypair in client-side keystore \"clientkeystore\""
-keytool -alias end-user-key -dname "CN=dat11al1 (Axel Larsson)/dat12pbr (Patrik Brosell)/dic12aha (Adrian Hansson)/dat12cti (Carl Tidelius) " -genkeypair -keystore clientkeystore -storepass password -keypass password
+keytool -alias end-user-key -dname "CN=dat11al1 (Axel Larsson)/dat12pbr (Patrik Brosell)/dic13aha (Adrian Hansson)/dat12cti (Carl Tidelius) " -genkeypair -keystore clientkeystore -storepass password -keypass password
 # 4.
 print_green "* Creating Certificate Signing Request (CSR) \"certSignReq.csr\""
 keytool -alias end-user-key -certreq -file certSignReq.csr -keystore clientkeystore -storepass password
