@@ -11,15 +11,8 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-certSignReq.csr
-./clientkeystore
-rootCAkey.pem
-rootCert.pem
-rootCert.srl
-signedCert
-truststore
-clienttruststore
-serverkeystore
-servertruststore
-signedSrvCert
-srvKeyStore.csr
+
+
+EIT060.iml
+build
+.idea

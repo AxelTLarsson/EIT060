@@ -1,5 +1,6 @@
-# EIT060
-Repo for the projects 1 and 2 in the course Computer Security EIT060
+# Project 1
+This folder is kept in the repo for historical purposes. The new stuff for project 2 builds on top of the work done
+in this folder but is no longer used.
 
 <h3>setup.sh</h3>
 This is the bash script file used to set up the certificates.
