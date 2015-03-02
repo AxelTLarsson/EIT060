@@ -9,17 +9,6 @@ print_green() {
 	echo
 }
 
-# Change directory to build/server
-cd ../build/server
-
-# Check that it worked so that we do not accidentally create stuff in wrong folder
-if [ $? -eq 0 ]; then
-    print_green "* Changed to ../build/server"
-else
-    echo "ERROR: Could not cd to ../build/server, exiting."
-    exit 1
-fi
-
 server_setup_warning()
 {
 cat << EOF
