@@ -80,33 +80,54 @@ public class Client {
 			System.out.println("certificate issuer on cert recieved from server:\n" + issuer + "\n");
 			System.out.println("certificate serial number on cert recieved from server:\n" + serial + "\n");
             System.out.println("socket after handshake:\n" + socket + "\n");
-            System.out.println("secure connection established\n\n");
+
 
             BufferedReader read = new BufferedReader(new InputStreamReader(System.in));
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            
+            // Wait for challenge
+            String challenge;
+            while((challenge = in.readLine()) != null) {
+                System.out.println("received '" + challenge + "' from server\n");
+                
+                if (challenge.startsWith("challenge: ")) {
+                    System.out.println("Challenge received: " + challenge);
+                    String nonce = challenge.split("challenge: ")[1];
+                    System.out.println("nonce: " + nonce);
+                            
+                    String response =  ResponseGenerator.getResponse(nonce);
+                    out.println(response);
+                    out.flush();
+                }
+                
+                if (challenge.equals("authenticated")) {
+                    System.out.println("Server has authenticated you.");
+                    break;
+                }
+                break;
+            }
+            
             String msg;
-			for (;;) {
+			while (socket.isConnected()) {
                 System.out.print(">");
                 msg = read.readLine();
                 if (msg.equalsIgnoreCase("quit")) {
 				    break;
 				}
-                System.out.print("sending '" + msg + "' to server...");
+                if (msg.equalsIgnoreCase("help") || msg.equalsIgnoreCase("h")) {
+                    displayHelpText();
+                    System.out.print(">");
+                    msg = read.readLine();
+                }
+                System.out.println("sending '" + msg + "' to server...");
                 out.println(msg);
                 out.flush();
                 System.out.println("done");
                 String nextLine;
                 while((nextLine = in.readLine()) != null) {
-                	System.out.println(/*"received '" + */nextLine/* + "' from server\n"*/);
-                    
-                    if (nextLine.startsWith("challenge: ")) {
-                        System.out.println("Server sent a challenge: " + nextLine);
-                        String response = ResponseGenerator.getResponse(nextLine);
-                        System.out.println("Response is: " + response);
-                        // TODO actually send response to server
-                    }
-                    
+                	System.out.println("received '" + nextLine + "' from server\n");
+                    break;
                 }
             }
             in.close();
@@ -116,6 +137,15 @@ public class Client {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private static void displayHelpText() {
+        String helpText = "Commands available:\n"
+                + "READ <personnummer>\n"
+                + "APPEND <personnummer> <text to append>\n"
+                + "DELETE <personnummer>\n"
+                + "ADD <personummer> <namn> <doktornamn> <doktorns personnummer> <nurse's name> <nurse's ID> <division> <text for the record>";
+        System.out.println(helpText);
     }
 
 }

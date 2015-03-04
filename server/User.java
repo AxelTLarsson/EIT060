@@ -1,4 +1,6 @@
 import java.io.Serializable;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 /**
  * Created by axel on 02/03/15.
@@ -10,13 +12,13 @@ public class User implements Serializable {
     private int IDnumber;
     private String type;
     private String division;
-    
+
     public static String DR = "DR";
     public static String Nurse = "NURSE";
     public static String Patient = "PATIENT";
     public static String Gov = "GOV";
     
-    public User(String name, String type, String password, int IDnumber, String division) { //Enum position
+    public User(String name, String type, String password, int IDnumber, String division) throws NoSuchAlgorithmException { //Enum position
         this.name = name;
         this.position = position;
         this.type = type;
@@ -24,7 +26,7 @@ public class User implements Serializable {
         this.IDnumber = IDnumber;
         this.division = division;
     }
-    
+
     @Override
     public String toString() {
         return name + " (" + IDnumber +") " + type + " : " + password;
@@ -40,7 +42,11 @@ public class User implements Serializable {
     public String getDivision() {
     	return division;
     }
-    
+
+    public String getPassword() {
+        return password;
+    }
+
     public enum Position {
         DR,
         NURSE,

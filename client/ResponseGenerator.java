@@ -1,3 +1,10 @@
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Arrays;
+
 /**
  * Created by axel on 04/03/15.
  */
@@ -7,12 +14,34 @@ public class ResponseGenerator {
     /**
      * Generate response to server challenge, asks
      * user for password.
-     * @param challenge the challenge from the server
-     * @return the correct response
      */
-    public static String getResponse(String challenge) {
-        char[] password = Utils.readPassword("Password for server authentication please: ");
-        return "response" + password;
+    public static String getResponse(String nonce) throws InvalidKeySpecException, NoSuchAlgorithmException {
+        int iterations = 1000;
+        char[] chars = (nonce + new String(Utils.readPassword("Password for server authentication please: "))).toCharArray();
+        System.out.println("chars: " + new String(chars));
+        byte[] salt = "salt".getBytes(); // Does not matter, since we are on an SSL connection and not actually storing the
+        System.out.println("byte[] salt: " + Arrays.toString(salt));
+        PBEKeySpec spec = new PBEKeySpec(chars, salt, iterations, 64 * 8);
+        SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+        byte[] hash = secretKeyFactory.generateSecret(spec).getEncoded();
+        System.out.println("RESPONSE: " + Arrays.toString(hash));
+        String response = stringToHex(hash);
+
+        System.out.println("Calculated response is: " + response + "\n made with nonce = " + nonce);
+
+        return response;
         
+    }
+
+    private static String stringToHex(byte[] array) {
+        BigInteger bi = new BigInteger(1, array);
+        String hex = bi.toString(16);
+        int paddingLength = (array.length * 2) - hex.length();
+        if(paddingLength > 0)
+        {
+            return String.format("%0"  +paddingLength + "d", 0) + hex;
+        }else{
+            return hex;
+        }
     }
 }

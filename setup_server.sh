@@ -53,7 +53,3 @@ keytool -import -file rootCert.pem -alias CA -keystore servertruststore -storepa
 # Cleanup
 print_green "* Cleaning up..."
 rm rootCert.srl srvKeyStore.csr signedSrvCert
-
-# Copy setup_new_client.sh to folder
-cp ../../src/setup_new_client.sh ./
-print_green "* To run the server, compile server.java and run it in this directory, e.g. \"java server 9876\""

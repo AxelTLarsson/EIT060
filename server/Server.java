@@ -1,6 +1,8 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -33,32 +35,60 @@ public class Server implements Runnable {
 			String subject = cert.getSubjectDN().getName();
 			String serial = cert.getSerialNumber().toString();
 			subject = subject.substring(3); // CN=personNummer -> personNummer
-			// TODO: Perform authentication, we here know which user is
-			// connected via the certs
-			// User user = Authenticator.authenticateUser(subject, users);
-			// TODO: Send Nonce and verify response
+			
+            
 			User user = Authenticator.authenticateUser(Integer.parseInt(subject), users);
-			if (user != null) {
-				System.out.println("User: " + user.toString() + " logged in");
-				// Now we know that the user is authenticated
-				if (user.getPosition() == user.Patient) {
-					// only READ
-					//read(user.getID());
-				}
+			if (user == null) {
+                System.err.println("Could not authenticate " + subject);
+                socket.close();
+				return; // this connection is not authenticated
 			}
 
+            System.out.println("User: " + user.toString() + " logged in");
+            // Now we know that the user is authenticated
+            if (user.getPosition() == user.Patient) {
+                // only READ
+                //read(user.getID());
+            }
+
+            // TODO: Send Nonce and verify response
+            String challenge = ChallengeGenerator.getChallenge();
+            String expectedResponse = ChallengeGenerator.getExpectedResponse(user);
+                       
+
+            // Set up connection to client
 			numConnectedClients++;
 			PrintWriter out = null;
 			BufferedReader in = null;
 			out = new PrintWriter(socket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(
 					socket.getInputStream()));
-			out.println("Authenticated as user: " + user);
+            
+            // Send challenge
+            System.out.println("Sending: challenge: " + challenge);
+			out.println("challenge: " + challenge);
+            out.flush();
+            String response = null;
+            while ((response = in.readLine()) != null) {
+                if (response.equals(expectedResponse)) {
+                    System.out.println("Client response: " + response + " matched expected response: " + expectedResponse);
+                    out.println("authenticated");
+                    out.flush();
+                    break;
+                } else {
+                    System.err.println("Client response wrong: " + response + ", terminating connection.");
+                    socket.close();
+                    return;
+                }
+            }
+            System.out.println("User " + user + " fully authenticated.");
+
 			String clientMsg = null;
 			while ((clientMsg = in.readLine()) != null) {
-//				System.out.println("received '" + clientMsg + "' from client:" + subject);
+				System.out.println("received '" + clientMsg + "' from client:" + subject);
 				String[] splitMsg = clientMsg.split(" ", 3);
 				System.out.println(splitMsg[0]);
+                // TODO switch kanske
 				int persNbr = Integer.parseInt(splitMsg[1]);
 				if (splitMsg[0].equals("ADD") && user.getPosition().equals(User.DR)) {
 					int persNr = Integer.parseInt(clientMsg.split(" ")[1]);
@@ -136,8 +166,12 @@ public class Server implements Runnable {
 			System.out.println("Client died: " + e.getMessage());
 			e.printStackTrace();
 			return;
-		}
-	}
+		} catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+    }
 	
 	private void log(String message) throws FileNotFoundException, UnsupportedEncodingException {
 		try {
@@ -193,9 +227,11 @@ public class Server implements Runnable {
 					System.err
 							.println("Wrong Format for field \"position\", the correct formats are: DR, NURSE, PATIENT or GOV");
 					System.exit(1);
-				}
+				} catch (NoSuchAlgorithmException e) {
+                    e.printStackTrace();
+                }
 
-			} else {
+            } else {
 				port = Integer.parseInt(args[0]);
 			}
 		}
