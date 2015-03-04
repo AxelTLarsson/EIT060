@@ -52,4 +52,7 @@ keytool -import -file rootCert.pem -alias CA -keystore servertruststore -storepa
 
 # Cleanup
 print_green "* Cleaning up..."
+mv servertruststore server/servertruststore
+mv serverkeystore server/serverkeystore
+
 rm rootCert.srl srvKeyStore.csr signedSrvCert

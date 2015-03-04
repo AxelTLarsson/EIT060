@@ -54,8 +54,13 @@ mkdir $USER_NAME
 mv clienttruststore ./$USER_NAME/
 mv clientkeystore ./$USER_NAME/
 
+# Copy Client.java and deps for convenience
+cp client/Client.java $USER_NAME/Client.java
+cp client/ResponseGenerator.java $USER_NAME/ResponseGenerator.java
+cp client/Utils.java  $USER_NAME/Utils.java
+
 # Clean up
 print_green "* Cleaning up..."
 rm certSignReq.csr signedCert rootCert.srl
 
-print_green "* To run the client, compile client.java and run it in the newly created directory, e.g. \"java client localhost 9876\""
+print_green "* To run the client, compile Client.java and run it in the newly created directory, e.g. \"java Client localhost 9876\""

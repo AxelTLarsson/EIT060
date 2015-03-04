@@ -44,14 +44,9 @@ public class Server implements Runnable {
 				return; // this connection is not authenticated
 			}
 
-            System.out.println("User: " + user.toString() + " logged in");
-            // Now we know that the user is authenticated
-            if (user.getPosition() == user.Patient) {
-                // only READ
-                //read(user.getID());
-            }
-
-            // TODO: Send Nonce and verify response
+            System.out.println("User: " + user.toString() + " logged in via certificates.");
+            
+            // Extra Challenge-Response
             String challenge = ChallengeGenerator.getChallenge();
             String expectedResponse = ChallengeGenerator.getExpectedResponse(user);
                        
@@ -88,7 +83,7 @@ public class Server implements Runnable {
 				System.out.println("received '" + clientMsg + "' from client:" + subject);
 				String[] splitMsg = clientMsg.split(" ", 3);
 				System.out.println(splitMsg[0]);
-                // TODO switch kanske
+
 				int persNbr = Integer.parseInt(splitMsg[1]);
 				if (splitMsg[0].equals("ADD") && user.getPosition().equals(User.DR)) {
 					int persNr = Integer.parseInt(clientMsg.split(" ")[1]);
@@ -204,7 +199,6 @@ public class Server implements Runnable {
 			// anything
 			if (args[0].equals("-add")) {
 				try {
-//					User.Position position = User.Position.valueOf(args[1]);
 					String typeArg = args[1];
 					String nameArg = args[2];
 					int persNbr = Integer.parseInt(args[3]);

@@ -18,17 +18,11 @@ public class ResponseGenerator {
     public static String getResponse(String nonce) throws InvalidKeySpecException, NoSuchAlgorithmException {
         int iterations = 1000;
         char[] chars = (nonce + new String(Utils.readPassword("Password for server authentication please: "))).toCharArray();
-        System.out.println("chars: " + new String(chars));
         byte[] salt = "salt".getBytes(); // Does not matter, since we are on an SSL connection and not actually storing the
-        System.out.println("byte[] salt: " + Arrays.toString(salt));
         PBEKeySpec spec = new PBEKeySpec(chars, salt, iterations, 64 * 8);
         SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
         byte[] hash = secretKeyFactory.generateSecret(spec).getEncoded();
-        System.out.println("RESPONSE: " + Arrays.toString(hash));
         String response = stringToHex(hash);
-
-        System.out.println("Calculated response is: " + response + "\n made with nonce = " + nonce);
-
         return response;
         
     }

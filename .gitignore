@@ -18,3 +18,6 @@ build
 .idea
 MedicalRecords.iml
 /bin
+
+.project
+.classpath
