@@ -72,10 +72,11 @@ public class Server implements Runnable {
 					medRecords.addRecord(persNr, new MedRecord(patName, persNr,
 							docName, docID, nurseName, nurseID, division, text));
 				}
-				else if (splitMsg[0].equals("APPEND") && user.getPosition().equals(User.DR)) {
+				else if (splitMsg[0].equals("APPEND") ) {
 					MedRecord tempRecord = medRecords.getRecord(persNbr);
 					if (tempRecord != null) {
-						if(user.getID() == tempRecord.getDocID()) {
+						if(user.getID() == tempRecord.getDocID() && user.getPosition().equals(user.DR) || 
+								user.getID() == tempRecord.getNurseID() && user.getPosition().equals(user.Nurse)) {
 							String information = clientMsg.split(" ", 3)[2];
 							if (medRecords.getRecord(persNbr) != null) {
 								medRecords.getRecord(persNbr).append(information);
@@ -93,7 +94,7 @@ public class Server implements Runnable {
 					if (tempRecord != null) {
 						if((user.getDivision().equals(tempRecord.getDivision()) && !user.getPosition().equals(user.Patient)) || 
 								user.getID() == tempRecord.getDocID() && user.getPosition().equals(user.DR) || 
-								user.getID() == tempRecord.getNurseID() && user.getPosition().equals(user.Nurse)|| 
+								user.getID() == tempRecord.getNurseID() && user.getPosition().equals(user.Nurse) || 
 								user.getID() == tempRecord.getPatientID() && user.getPosition().equals(user.Patient) ||
 								user.getPosition().equals(user.Gov)) {
 							out.println(tempRecord);					
