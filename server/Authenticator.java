@@ -10,7 +10,7 @@ public class Authenticator {
         return "password";
     }
 
-    public static User authenticateUser(String subject, HashMap<String, User> users) {
+    public static User authenticateUser(Integer subject, HashMap<Integer, User> users) {
         return users.get(subject);
     }
 }

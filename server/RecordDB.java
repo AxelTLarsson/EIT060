@@ -15,11 +15,19 @@ public class RecordDB implements Serializable{
 	}
 	
 	public MedRecord getRecord(Integer persNbr) {
+		//logga
 		return records.get(persNbr);
 	}
 	
 	public void addRecord(Integer persNbr, MedRecord medRecord) {
+		//logga
 		records.put(persNbr, medRecord);
+		this.saveToDisk();
+	}
+	
+	public void deleteRecord(Integer persNbr) {
+		//logga
+		records.remove(persNbr);
 		this.saveToDisk();
 	}
 	
