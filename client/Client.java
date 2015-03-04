@@ -1,9 +1,7 @@
-import java.net.*;
 import java.io.*;
 import javax.net.ssl.*;
 import javax.security.cert.X509Certificate;
 import java.security.KeyStore;
-import java.security.cert.*;
 
 /*
  * This example shows how to set up a key manager to perform client
@@ -16,44 +14,52 @@ import java.security.cert.*;
 public class Client {
 
     public static void main(String[] args) throws Exception {
+        // Initialize variables
         String host = null;
         int port = -1;
-        char[] password = "adhahahah".toCharArray();
-        for (int i = 0; i < args.length; i++) {
-            System.out.println("args[" + i + "] = " + args[i]);
+        char[] password = null;
+
+        // Check that we have the correct number of args
+        if (args.length != 2) {
+            System.err.println("USAGE: java client host port");
+            System.exit(-1);
         }
-        if (args.length < 2) {
+        
+        // Get the arguments (server host and port number)
+        try {
+            host = args[0];
+            port = Integer.parseInt(args[1]);
+        } catch (IllegalArgumentException e) {
             System.out.println("USAGE: java client host port password");
             System.exit(-1);
         }
-        try { /* get input parameters */
-            host = args[0];
-            port = Integer.parseInt(args[1]);
-            password = args[2].toCharArray();
-        } catch (IllegalArgumentException e) {
-            System.out.println("USAGE: java client host port");
-            System.exit(-1);
-        }
+        
+        // Ask for password to key- and truststore
+        password = Utils.readPassword("Password to key- and truststores please.");
+
 
         try { /* set up a key manager for client authentication */
             SSLSocketFactory factory = null;
             try {
-//                char[] password = "password".toCharArray();
-            	
+                // Load key- and truststore
                 KeyStore ks = KeyStore.getInstance("JKS");
                 KeyStore ts = KeyStore.getInstance("JKS");
                 KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
                 TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
+                
+                // Get SSLContext and read key- and truststores
                 SSLContext ctx = SSLContext.getInstance("TLS");
-                ks.load(new FileInputStream("clientkeystore"), password);  // keystore password (storepass)
-				ts.load(new FileInputStream("clienttruststore"), password); // truststore password (storepass);
-				kmf.init(ks, password); // user password (keypass)
-				tmf.init(ts); // keystore can be used as truststore here
+                ks.load(new FileInputStream("clientkeystore"), password);
+				ts.load(new FileInputStream("clienttruststore"), password);
+				kmf.init(ks, password);
+				tmf.init(ts);
 				ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
                 factory = ctx.getSocketFactory();
             } catch (Exception e) {
                 throw new IOException(e.getMessage());
             }
+            
+            // Create socket
             SSLSocket socket = (SSLSocket)factory.createSocket(host, port);
             System.out.println("\nsocket before handshake:\n" + socket + "\n");
 
@@ -93,6 +99,14 @@ public class Client {
                 String nextLine;
                 while((nextLine = in.readLine()) != null) {
                 	System.out.println(/*"received '" + */nextLine/* + "' from server\n"*/);
+                    
+                    if (nextLine.startsWith("challenge: ")) {
+                        System.out.println("Server sent a challenge: " + nextLine);
+                        String response = ResponseGenerator.getResponse(nextLine);
+                        System.out.println("Response is: " + response);
+                        // TODO actually send response to server
+                    }
+                    
                 }
             }
             in.close();

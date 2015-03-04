@@ -189,6 +189,7 @@ public class Server implements Runnable {
 					saveUsersToDisk();
 					System.exit(0);
 				} catch (IllegalArgumentException ex) {
+                    System.out.println(ex);
 					System.err
 							.println("Wrong Format for field \"position\", the correct formats are: DR, NURSE, PATIENT or GOV");
 					System.exit(1);
