@@ -18,6 +18,7 @@ public class Server implements Runnable {
 	private static int numConnectedClients = 0;
 	private static HashMap<Integer, User> users;
 	private static RecordDB medRecords;
+    private boolean authed;
 
 	public Server(ServerSocket ss) throws IOException {
 		serverSocket = ss;
@@ -64,9 +65,10 @@ public class Server implements Runnable {
 			out.println("challenge: " + challenge);
             out.flush();
             String response = null;
-            while ((response = in.readLine()) != null) {
+            while ((response = in.readLine()) != null && !authed) {
                 if (response.equals(expectedResponse)) {
                     System.out.println("Client response: " + response + " matched expected response: " + expectedResponse);
+                    authed = true;
                     out.println("authenticated");
                     out.flush();
                     break;
