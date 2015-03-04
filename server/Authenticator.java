@@ -11,6 +11,6 @@ public class Authenticator {
     }
 
     public static User authenticateUser(String subject, HashMap<String, User> users) {
-        return null;
+        return users.get(subject);
     }
 }

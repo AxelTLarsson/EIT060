@@ -2,17 +2,19 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.security.KeyStore;
 import java.util.HashMap;
+
 import javax.naming.AuthenticationNotSupportedException;
 import javax.net.*;
 import javax.net.ssl.*;
 import javax.security.cert.X509Certificate;
 
-public class server implements Runnable {
+public class Server implements Runnable {
     private ServerSocket serverSocket = null;
     private static int numConnectedClients = 0;
     private static HashMap<String, User> users;
+    private static RecordDB medRecords;
 
-    public server(ServerSocket ss) throws IOException {
+    public Server(ServerSocket ss) throws IOException {
         serverSocket = ss;
         newListener();
     }
@@ -26,32 +28,49 @@ public class server implements Runnable {
 			String issuer = cert.getIssuerDN().getName();
             String subject = cert.getSubjectDN().getName();
 			String serial = cert.getSerialNumber().toString();
+			subject = subject.substring(3);  // CN=Name -> Name
             // TODO: Perform authentication, we here know which user is connected via the certs
+			User user = Authenticator.authenticateUser(subject, users);
             // TODO: Send Nonce and verify response
-            User user = Authenticator.authenticateUser(subject, users);
-            
             if (user != null) {
+            	System.out.println("User: " + user.toString() + " logged in");
                 // Now we know that the user is authenticated
             }
-            /*
+            
+            
             numConnectedClients++;
-            System.out.println("client connected");
-            System.out.println("client name (cert subject DN field): " + subject);
-			System.out.println("client issuer (cert issuer DN field): " + issuer);
-			System.out.println("client certificate serial: " + serial);
-            System.out.println(numConnectedClients + " concurrent connection(s)\n");
-
             PrintWriter out = null;
             BufferedReader in = null;
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
+        	out.println("Authenticated as user: " + user);
+        	out.println("do what you want to do");
             String clientMsg = null;
             while ((clientMsg = in.readLine()) != null) {
-			    String rev = new StringBuilder(clientMsg).reverse().toString();
                 System.out.println("received '" + clientMsg + "' from client:" + subject);
-                System.out.print("sending '" + rev + "' to client...");
-				out.println(rev);
+                String[] splitMsg = clientMsg.split(" ", 2);
+                System.out.println(splitMsg[0]);
+                if(splitMsg[0].equals("ADD")) {
+                	int persNr = Integer.parseInt(clientMsg.split(" ")[1]);
+                	String patName = clientMsg.split(" ")[2];
+                	String docName = clientMsg.split(" ")[3];
+                	String nurseName = clientMsg.split(" ")[4];
+                	String division = clientMsg.split(" ")[5];
+                	String text = clientMsg.split(" ", 7)[6];
+                	medRecords.addRecord(persNr, new MedRecord(patName, docName, nurseName, division, text));
+                }
+                if(splitMsg[0].equals("APPEND")) {
+                	System.out.println("vill appenda");
+                }
+                if(splitMsg[0].equals("READ")) {
+                	int persNbr = Integer.parseInt(splitMsg[1]);
+                	System.out.println("Vill läsa");
+                	System.out.println(medRecords.getRecord(persNbr).toString());
+                	out.println(medRecords.getRecord(persNbr).toString());
+                }
+                if(splitMsg[0].equals("DELETE")) {
+                	System.out.println("Vill radera");
+                }
 				out.flush();
                 System.out.println("done\n");
 			}
@@ -61,8 +80,8 @@ public class server implements Runnable {
     	    numConnectedClients--;
             System.out.println("client disconnected");
             System.out.println(numConnectedClients + " concurrent connection(s)\n");
+            System.out.println(medRecords.getRecord(123456));
             
-            */
 		} catch (IOException e) {
             System.out.println("Client died: " + e.getMessage());
             e.printStackTrace();
@@ -73,6 +92,8 @@ public class server implements Runnable {
     private void newListener() { (new Thread(this)).start(); } // calls run()
 
     public static void main(String args[]) {
+    	medRecords = new RecordDB();
+    	medRecords = medRecords.loadFromDisk();
         loadUsersFromDisk();
         System.out.println("users loaded:" + users.size() + " " + users);
 
@@ -109,14 +130,14 @@ public class server implements Runnable {
             ServerSocketFactory ssf = getServerSocketFactory(type);
             ServerSocket ss = ssf.createServerSocket(port);
             ((SSLServerSocket)ss).setNeedClientAuth(true); // enables client authentication
-            new server(ss);
+            new Server(ss);
         } catch (IOException e) {
             System.out.println("Unable to start Server: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    // Tries to read users file from disk
+	// Tries to read users file from disk
     // If it is not present, it creates a new HashMap
     private static void loadUsersFromDisk() {
         try

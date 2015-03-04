@@ -13,21 +13,23 @@ import java.security.cert.*;
  * The application can be modified to connect to a server outside
  * the firewall by following SSLSocketClientWithTunneling.java.
  */
-public class client {
+public class Client {
 
     public static void main(String[] args) throws Exception {
         String host = null;
         int port = -1;
+        char[] password = "adhahahah".toCharArray();
         for (int i = 0; i < args.length; i++) {
             System.out.println("args[" + i + "] = " + args[i]);
         }
         if (args.length < 2) {
-            System.out.println("USAGE: java client host port");
+            System.out.println("USAGE: java client host port password");
             System.exit(-1);
         }
         try { /* get input parameters */
             host = args[0];
             port = Integer.parseInt(args[1]);
+            password = args[2].toCharArray();
         } catch (IllegalArgumentException e) {
             System.out.println("USAGE: java client host port");
             System.exit(-1);
@@ -36,7 +38,8 @@ public class client {
         try { /* set up a key manager for client authentication */
             SSLSocketFactory factory = null;
             try {
-                char[] password = "password".toCharArray();
+//                char[] password = "password".toCharArray();
+            	
                 KeyStore ks = KeyStore.getInstance("JKS");
                 KeyStore ts = KeyStore.getInstance("JKS");
                 KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
@@ -78,7 +81,7 @@ public class client {
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             String msg;
 			for (;;) {
-                System.out.print(">");
+//                System.out.print(">");
                 msg = read.readLine();
                 if (msg.equalsIgnoreCase("quit")) {
 				    break;
@@ -88,7 +91,7 @@ public class client {
                 out.flush();
                 System.out.println("done");
 
-                System.out.println("received '" + in.readLine() + "' from server\n");
+                System.out.println(/*"received '" + */in.readLine()/* + "' from server\n"*/);
             }
             in.close();
 			out.close();
