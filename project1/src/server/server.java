@@ -11,7 +11,7 @@ public class server implements Runnable {
     private ServerSocket serverSocket = null;
     private static int numConnectedClients = 0;
 
-    public server(ServerSocket ss) throws IOException {
+    public server(ServerSocket ss) {
         serverSocket = ss;
         newListener();
     }
@@ -32,12 +32,12 @@ public class server implements Runnable {
 			System.out.println("client certificate serial: " + serial);
             System.out.println(numConnectedClients + " concurrent connection(s)\n");
 
-            PrintWriter out = null;
-            BufferedReader in = null;
+            PrintWriter out;
+            BufferedReader in;
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            String clientMsg = null;
+            String clientMsg;
             while ((clientMsg = in.readLine()) != null) {
 			    String rev = new StringBuilder(clientMsg).reverse().toString();
                 System.out.println("received '" + clientMsg + "' from client");
@@ -55,7 +55,6 @@ public class server implements Runnable {
 		} catch (IOException e) {
             System.out.println("Client died: " + e.getMessage());
             e.printStackTrace();
-            return;
         }
     }
 
@@ -81,7 +80,7 @@ public class server implements Runnable {
 
     private static ServerSocketFactory getServerSocketFactory(String type) {
         if (type.equals("TLS")) {
-            SSLServerSocketFactory ssf = null;
+            SSLServerSocketFactory ssf;
             try { // set up key manager to perform server authentication
                 SSLContext ctx = SSLContext.getInstance("TLS");
                 KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");

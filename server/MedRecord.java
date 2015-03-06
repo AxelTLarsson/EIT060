@@ -5,14 +5,14 @@ import java.util.Date;
 
 
 public class MedRecord implements Serializable{
-	private String patient;
-	private String doctor;
-	private String nurse;
-	private String division;
+	private final String patient;
+	private final String doctor;
+	private final String nurse;
+	private final String division;
 	private String information;
-	private int patientID, doctorID, nurseID;
+	private String patientID, doctorID, nurseID;
 
-	public MedRecord(String patient, int patientID, String doctor, int doctorID, String nurse, int nurseID, String division, String text) {
+	public MedRecord(String patient, String patientID, String doctor, String doctorID, String nurse, String nurseID, String division, String text) {
 		this.patient = patient;
 		this.patientID = patientID;
 		this.doctor = doctor;
@@ -24,15 +24,15 @@ public class MedRecord implements Serializable{
 		append(text);
 	}
 	
-	public int getDocID() {
+	public String getDocID() {
 		return doctorID;
 	}
 	
-	public int getNurseID() {
+	public String getNurseID() {
 		return nurseID;
 	}
 	
-	public int getPatientID() {
+	public String getPatientID() {
 		return patientID;
 	}
 	

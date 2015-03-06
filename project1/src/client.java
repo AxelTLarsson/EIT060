@@ -1,9 +1,7 @@
-import java.net.*;
 import java.io.*;
 import javax.net.ssl.*;
 import javax.security.cert.X509Certificate;
 import java.security.KeyStore;
-import java.security.cert.*;
 
 /*
  * This example shows how to set up a key manager to perform client
@@ -34,7 +32,7 @@ public class client {
         }
 
         try { /* set up a key manager for client authentication */
-            SSLSocketFactory factory = null;
+            SSLSocketFactory factory;
             try {
                 char[] password = "password".toCharArray();
                 KeyStore ks = KeyStore.getInstance("JKS");

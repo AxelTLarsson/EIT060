@@ -8,24 +8,24 @@ import java.util.HashMap;
 
 
 public class RecordDB implements Serializable{
-	private HashMap<Integer, MedRecord> records;
-	
+	private HashMap<String, MedRecord> records;
+
 	public RecordDB() {
-		this.records = new HashMap<Integer, MedRecord>();
+		this.records = new HashMap<String, MedRecord>();
 	}
 	
-	public MedRecord getRecord(Integer persNbr) {
+	public MedRecord getRecord(String persNbr) {
 		//logga
 		return records.get(persNbr);
 	}
 	
-	public void addRecord(Integer persNbr, MedRecord medRecord) {
+	public void addRecord(String persNbr, MedRecord medRecord) {
 		//logga
 		records.put(persNbr, medRecord);
 		this.saveToDisk();
 	}
 	
-	public void deleteRecord(Integer persNbr) {
+	public void deleteRecord(String persNbr) {
 		//logga
 		records.remove(persNbr);
 		this.saveToDisk();
@@ -45,22 +45,23 @@ public class RecordDB implements Serializable{
         }
 		
 	}
-	
+
+    @SuppressWarnings("unchecked")
 	public RecordDB loadFromDisk() {
         try
         {
             FileInputStream fileIn = new FileInputStream("records");
             ObjectInputStream in = new ObjectInputStream(fileIn);
-            records = (HashMap<Integer, MedRecord>) in.readObject();
+            records = (HashMap<String, MedRecord>) in.readObject();
             in.close();
             fileIn.close();
-        } catch(IOException i) {
-            i.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } 
+        } catch (IOException i) {
+            System.err.println("Could not find file \"records\", a new one will be created.");
+        } catch (ClassNotFoundException e) { // Probably happens when upgrading
+            System.err.println("Could not load file \"records\", delete the file and start over.");
+        }
         if (records == null) {
-        	records = new HashMap<Integer, MedRecord>();
+        	records = new HashMap<String, MedRecord>();
         	this.saveToDisk();
         }
         return this;

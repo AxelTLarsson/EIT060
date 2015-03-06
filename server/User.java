@@ -1,26 +1,21 @@
 import java.io.Serializable;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 
-/**
- * Created by axel on 02/03/15.
- */
 public class User implements Serializable {
-    private String name;
+    private final String name;
     private Enum position;
-    private String password; // Yes, that is right we are storing the password in clear text, but secure room
-    private int IDnumber;
-    private String type;
-    private String division;
+    private final String password; // Yes, that is right we are storing the password in clear text, but secure room
+    private final String IDnumber;
+    private final String type;
+    private final String division;
 
-    public static String DR = "DR";
-    public static String Nurse = "NURSE";
-    public static String Patient = "PATIENT";
-    public static String Gov = "GOV";
+    public static final String DR = "DR";
+    public static final String NURSE = "NURSE";
+    public static final String PATIENT = "PATIENT";
+    public static final String GOV = "GOV";
     
-    public User(String name, String type, String password, int IDnumber, String division) throws NoSuchAlgorithmException { //Enum position
+    public User(String name, String type, String password, String IDnumber, String division) { //Enum position
         this.name = name;
-        this.position = position;
+        this.position = position; // Vad händer här? Detta är ju helt galet eller?
         this.type = type;
         this.password = password;
         this.IDnumber = IDnumber;
@@ -31,7 +26,7 @@ public class User implements Serializable {
     public String toString() {
         return name + " (" + IDnumber +") " + type + " : " + password;
     }
-    public int getID(){
+    public String getID(){
     	return IDnumber;
     }
     

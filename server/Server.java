@@ -8,7 +8,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
-import javax.naming.AuthenticationNotSupportedException;
 import javax.net.*;
 import javax.net.ssl.*;
 import javax.security.cert.X509Certificate;
@@ -16,11 +15,11 @@ import javax.security.cert.X509Certificate;
 public class Server implements Runnable {
 	private ServerSocket serverSocket = null;
 	private static int numConnectedClients = 0;
-	private static HashMap<Integer, User> users;
+	private static HashMap<String, User> users;
 	private static RecordDB medRecords;
     private boolean authed;
 
-	public Server(ServerSocket ss) throws IOException {
+	private Server(ServerSocket ss) {
 		serverSocket = ss;
 		newListener();
 	}
@@ -38,7 +37,7 @@ public class Server implements Runnable {
 			subject = subject.substring(3); // CN=personNummer -> personNummer
 			
             
-			User user = Authenticator.authenticateUser(Integer.parseInt(subject), users);
+			User user = Authenticator.authenticateUser(subject, users);
 			if (user == null) {
                 System.err.println("Could not authenticate " + subject);
                 socket.close();
@@ -86,14 +85,14 @@ public class Server implements Runnable {
 				String[] splitMsg = clientMsg.split(" ", 3);
 				System.out.println(splitMsg[0]);
 
-				int persNbr = Integer.parseInt(splitMsg[1]);
+				String persNbr = splitMsg[1];
 				if (splitMsg[0].equals("ADD") && user.getPosition().equals(User.DR)) {
-					int persNr = Integer.parseInt(clientMsg.split(" ")[1]);
+					String persNr = clientMsg.split(" ")[1];
 					String patName = clientMsg.split(" ")[2];
 					String docName = clientMsg.split(" ")[3];
-					int docID = Integer.parseInt(clientMsg.split(" ")[4]);
+					String docID = clientMsg.split(" ")[4];
 					String nurseName = clientMsg.split(" ")[5];
-					int nurseID = Integer.parseInt(clientMsg.split(" ")[6]);
+					String nurseID = clientMsg.split(" ")[6];
 					String division = clientMsg.split(" ")[7];
 					String text = clientMsg.split(" ", 9)[8];
 					medRecords.addRecord(persNr, new MedRecord(patName, persNr,
@@ -102,8 +101,8 @@ public class Server implements Runnable {
 				else if (splitMsg[0].equals("APPEND") ) {
 					MedRecord tempRecord = medRecords.getRecord(persNbr);
 					if (tempRecord != null) {
-						if(user.getID() == tempRecord.getDocID() && user.getPosition().equals(user.DR) || 
-								user.getID() == tempRecord.getNurseID() && user.getPosition().equals(user.Nurse)) {
+						if(user.getID() == tempRecord.getDocID() && user.getPosition().equals(User.DR) ||
+								user.getID() == tempRecord.getNurseID() && user.getPosition().equals(User.NURSE)) {
 							String information = clientMsg.split(" ", 3)[2];
 							if (medRecords.getRecord(persNbr) != null) {
 								medRecords.getRecord(persNbr).append(information);
@@ -119,11 +118,11 @@ public class Server implements Runnable {
 				else if (splitMsg[0].equals("READ")) {
 					MedRecord tempRecord = medRecords.getRecord(persNbr);
 					if (tempRecord != null) {
-						if((user.getDivision().equals(tempRecord.getDivision()) && !user.getPosition().equals(user.Patient)) || 
-								user.getID() == tempRecord.getDocID() && user.getPosition().equals(user.DR) || 
-								user.getID() == tempRecord.getNurseID() && user.getPosition().equals(user.Nurse) || 
-								user.getID() == tempRecord.getPatientID() && user.getPosition().equals(user.Patient) ||
-								user.getPosition().equals(user.Gov)) {
+						if((user.getDivision().equals(tempRecord.getDivision()) && !user.getPosition().equals(User.PATIENT)) ||
+								user.getID() == tempRecord.getDocID() && user.getPosition().equals(User.DR) ||
+								user.getID() == tempRecord.getNurseID() && user.getPosition().equals(User.NURSE) ||
+								user.getID() == tempRecord.getPatientID() && user.getPosition().equals(User.PATIENT) ||
+								user.getPosition().equals(User.GOV)) {
 							out.println(tempRecord);					
 						} else {
 							out.println("Permission denied!");
@@ -132,7 +131,7 @@ public class Server implements Runnable {
 						out.println("RECORD NOT FOUND");
 					}
 				}
-				else if (splitMsg[0].equals("DELETE") && user.getPosition().equals(User.Gov)) {
+				else if (splitMsg[0].equals("DELETE") && user.getPosition().equals(User.GOV)) {
 					if (medRecords.getRecord(persNbr) != null) {
 							medRecords.deleteRecord(persNbr);
 					} else {
@@ -162,7 +161,6 @@ public class Server implements Runnable {
 		} catch (IOException e) {
 			System.out.println("Client died: " + e.getMessage());
 			e.printStackTrace();
-			return;
 		} catch (InvalidKeySpecException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {
@@ -203,29 +201,28 @@ public class Server implements Runnable {
 				try {
 					String typeArg = args[1];
 					String nameArg = args[2];
-					int persNbr = Integer.parseInt(args[3]);
+					String persNbr = args[3];
+                    // Check for unique persNbr
+                    if (users.containsKey(persNbr)) {
+                        System.err.println("Database already contains a user with specified ID.");
+                        System.exit(1);
+                    }
 					String division = args[4];
-					System.out.println("Setting up new user: " + typeArg + " "
-							+ nameArg);
-
 					String password = Authenticator.getRandomPassword();
 					System.out.println("New password for user " + nameArg
-							+ ": " + password);
+							+ ":\n" + password);
 					System.out
 							.println("Remember it, this will be the only time it is shown.");
 					User newUser = new User(nameArg, typeArg, password, persNbr, division);
-					System.out.println("newUSeR: " + newUser);
 					users.put(persNbr, newUser);
 					saveUsersToDisk();
 					System.exit(0);
 				} catch (IllegalArgumentException ex) {
-                    System.out.println(ex);
+                    System.out.println(ex.getMessage());
 					System.err
-							.println("Wrong Format for field \"position\", the correct formats are: DR, NURSE, PATIENT or GOV");
+							.println("Wrong format for option add, the correct format is:\n -add <position {DR, NURSE, PATIENT or GOV}> <name> <ID number> <division>");
 					System.exit(1);
-				} catch (NoSuchAlgorithmException e) {
-                    e.printStackTrace();
-                }
+				}
 
             } else {
 				port = Integer.parseInt(args[0]);
@@ -246,20 +243,22 @@ public class Server implements Runnable {
 
 	// Tries to read users file from disk
 	// If it is not present, it creates a new HashMap
+    @SuppressWarnings("unchecked")
 	private static void loadUsersFromDisk() {
 		try {
 			FileInputStream fileIn = new FileInputStream("users");
 			ObjectInputStream in = new ObjectInputStream(fileIn);
-			users = (HashMap<Integer, User>) in.readObject();
+
+			users = (HashMap<String, User>) in.readObject();
 			in.close();
 			fileIn.close();
 		} catch (IOException i) {
-			i.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+            System.err.println("Could not find file \"users\", a new one will be created.");
+		} catch (ClassNotFoundException e) { // Probably happens when upgrading
+			System.err.println("Could not load file \"users\", delete the file and start over.");
 		}
 		if (users == null) {
-			users = new HashMap<Integer, User>();
+			users = new HashMap<String, User>();
 		}
 
 	}

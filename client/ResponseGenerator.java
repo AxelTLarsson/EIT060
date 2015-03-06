@@ -3,11 +3,6 @@ import javax.crypto.spec.PBEKeySpec;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Arrays;
-
-/**
- * Created by axel on 04/03/15.
- */
 
 public class ResponseGenerator {
     
@@ -22,8 +17,7 @@ public class ResponseGenerator {
         PBEKeySpec spec = new PBEKeySpec(chars, salt, iterations, 64 * 8);
         SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
         byte[] hash = secretKeyFactory.generateSecret(spec).getEncoded();
-        String response = stringToHex(hash);
-        return response;
+        return stringToHex(hash);
         
     }
 

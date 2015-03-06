@@ -1,17 +1,13 @@
-/**
- * Created by axel on 04/03/15.
- */
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Arrays;
 
-public class ChallengeGenerator {
-    private static SecureRandom random = new SecureRandom();
-    public static String nonce;
+public final class ChallengeGenerator {
+    private static final SecureRandom random = new SecureRandom();
+    private static String nonce;
     
     /**
      * Generates challenge to be sent to client* 
@@ -29,8 +25,7 @@ public class ChallengeGenerator {
         PBEKeySpec spec = new PBEKeySpec(chars, salt, iterations, 64 * 8);
         SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
         byte[] hash = secretKeyFactory.generateSecret(spec).getEncoded();
-        String expectedResponse = stringToHex(hash);
-        return expectedResponse;
+        return stringToHex(hash);
     }
 
     private static String stringToHex(byte[] array) {

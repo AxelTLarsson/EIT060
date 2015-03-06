@@ -35,29 +35,29 @@ print_green "* Adding root certificate \"CA\" to new trustore..."
 keytool -import -file rootCert.pem -alias CA -keystore clienttruststore -storepass password -noprompt
 
 print_green "* Creating end-user keypair in client-side keystore \"clientkeystore\" for $1"
-keytool -alias $USER_NAME -dname "CN=$USER_NAME" -genkeypair -keystore clientkeystore -storepass password -keypass password
+keytool -alias "${USER_NAME}" -dname "CN=${USER_NAME}" -genkeypair -keystore clientkeystore -storepass password -keypass password
 
 # Sign the key-pair
 print_green "* Creating Certificate Signing Request (CSR) \"certSignReq.csr\""
-keytool -alias $USER_NAME -certreq -file certSignReq.csr -keystore clientkeystore -storepass password
+keytool -alias "${USER_NAME}" -certreq -file certSignReq.csr -keystore clientkeystore -storepass password
 print_green "* Signing the Certificate Signing Request..."
 openssl x509 -CAcreateserial -in certSignReq.csr -req -CA rootCert.pem -CAkey rootCAkey.pem -out signedCert -passin pass:password
 
 # Save certificate chain tn keystore
 print_green "* Importing certificate chain into keystore \"clientkeystore\""
 keytool -import -file rootCert.pem -alias CA -keystore clientkeystore -storepass password -noprompt
-keytool -trustcacerts -alias $USER_NAME -import -file signedCert -keystore clientkeystore -storepass password
+keytool -trustcacerts -alias "${USER_NAME}" -import -file signedCert -keystore clientkeystore -storepass password
 
-# Move files to new folder $USER_NAME
-print_green "* Moving output to folder $USER_NAME"
-mkdir $USER_NAME
-mv clienttruststore ./$USER_NAME/
-mv clientkeystore ./$USER_NAME/
+# Move files to new folder "${USER_NAME}"
+print_green "* Moving output to folder "${USER_NAME}""
+mkdir "${USER_NAME}"
+mv clienttruststore ./"${USER_NAME}"/
+mv clientkeystore ./"${USER_NAME}"/
 
 # Copy Client.java and deps for convenience
-cp client/Client.java $USER_NAME/Client.java
-cp client/ResponseGenerator.java $USER_NAME/ResponseGenerator.java
-cp client/Utils.java  $USER_NAME/Utils.java
+cp client/Client.java "${USER_NAME}"/Client.java
+cp client/ResponseGenerator.java "${USER_NAME}"/ResponseGenerator.java
+cp client/Utils.java  "${USER_NAME}"/Utils.java
 
 # Clean up
 print_green "* Cleaning up..."

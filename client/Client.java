@@ -17,7 +17,7 @@ public class Client {
         // Initialize variables
         String host = null;
         int port = -1;
-        char[] password = null;
+        char[] password;
 
         // Check that we have the correct number of args
         if (args.length != 2) {
@@ -39,7 +39,7 @@ public class Client {
 
 
         try { /* set up a key manager for client authentication */
-            SSLSocketFactory factory = null;
+            SSLSocketFactory factory;
             try {
                 // Load key- and truststore
                 KeyStore ks = KeyStore.getInstance("JKS");
