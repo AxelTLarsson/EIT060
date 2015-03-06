@@ -7,7 +7,6 @@ public class Utils {
             Console console = System.console();
             if (console != null) {
                 password = console.readPassword(message);
-                System.out.println("password was: " + new String(password));
             } else {
                 System.err.println("Console not available, try running from a real terminal and not an IDE.");
             }
