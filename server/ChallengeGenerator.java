@@ -19,7 +19,6 @@ public class ChallengeGenerator {
      */
     public static String getChallenge() {
         ChallengeGenerator.nonce = new BigInteger(130, random).toString();
-        System.out.println("Challenge generated: " + nonce);
         return nonce;
     }
     
@@ -27,13 +26,10 @@ public class ChallengeGenerator {
         int iterations = 1000;
         char[] chars = (nonce + user.getPassword()).toCharArray();
         byte[] salt = "salt".getBytes(); // Does not matter, since we are on an SSL connection and not actually storing the 
-        System.out.println("byte[] salt: " + Arrays.toString(salt));
         PBEKeySpec spec = new PBEKeySpec(chars, salt, iterations, 64 * 8);
         SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
         byte[] hash = secretKeyFactory.generateSecret(spec).getEncoded();
         String expectedResponse = stringToHex(hash);
-        
-        System.out.println("Expected response is: " + expectedResponse + " Generated with nonce: " + nonce );
         return expectedResponse;
     }
 
